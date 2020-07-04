@@ -7,6 +7,7 @@ services:
         MODS: 378160973,375859599,362175979
         # GlobalPositions, HealthInfo, WormholeMarks
     container_name: world
+    restart: always
     tty: true
     stdin_open: true
     command: dst-server start --update=all
