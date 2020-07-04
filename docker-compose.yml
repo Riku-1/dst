@@ -1,0 +1,17 @@
+version: "2"
+services:
+  world:
+    build:
+      context: https://github.com/dst-academy/docker-dontstarvetogether.git#v0.8.0:build
+      args:
+        MODS: 378160973,375859599,362175979
+        # GlobalPositions, HealthInfo, WormholeMarks
+    container_name: world
+    tty: true
+    stdin_open: true
+    command: dst-server start --update=all
+    ports:
+      - "10999:10999/udp"
+    env_file: .env
+    volumes:
+      - ./world:/var/lib/dsta/cluster
