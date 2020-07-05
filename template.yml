@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+  # EC2
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-0cfa3caed4b487e77
+      SecurityGroupIds:
+        - !GetAtt SecurityGroup.GroupId
+      SubnetId: '{{resolve:ssm:default-subnet-id:1}}'
+      IamInstanceProfile: !Ref IamInstanceProfile
+      Tags:
+        - Key: Name
+          Value: dst
+
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: dst
+      GroupDescription: dst-game
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 10999
+          ToPort: 10999
+          CidrIp: 0.0.0.0/0
+      VpcId: '{{resolve:ssm:default-public-1a:1}}'
+      Tags:
+        - Key: Name
+          Value: dst
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /ec2/
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+  
+  IamInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /ec2/
+      Roles:
+        - !Ref EC2Role
+
